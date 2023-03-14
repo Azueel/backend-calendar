@@ -6,20 +6,20 @@ const UsuarioSchema = Schema({
 		required: true,
 	},
 
-	email: {
+	price: {
 		type: String,
 		required: true,
-		unique: true,
 	},
 
-	password: {
+	quantity: {
 		type: String,
 		required: true,
 	},
-	rol: {
+
+	description: {
 		type: String,
-		default: 'usuario',
+		required: true,
 	},
 });
 
-module.exports = model('Usuario', UsuarioSchema);
+module.exports = model('Producto', UsuarioSchema);

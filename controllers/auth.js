@@ -1,7 +1,7 @@
 const express = require('express');
 const Usuario = require('../models/usuario-model');
 const bcrypt = require('bcryptjs');
-const { generarJWT } = require('../helpers/jwt');
+const jwt = require('jsonwebtoken');
 
 const crearUsuario = async (req, res = express.response) => {
 	const { email, password } = req.body;
@@ -24,16 +24,24 @@ const crearUsuario = async (req, res = express.response) => {
 		usuario.password = bcrypt.hashSync(password, salt);
 
 		//guardar usuario en la base de datos
-		await usuario.save();
 
 		//generar jwt
-		const token = await generarJWT(usuario.id, usuario.name);
+		const payload = {
+			id: usuario._id,
+			name: usuario.name,
+			usuario: usuario.rol,
+		};
+
+		const token = jwt.sign(payload, process.env.SECRET_JWT_SEED, {
+			expiresIn: '60000ms',
+		});
 
 		res.status(201).json({
 			ok: true,
 			uid: usuario.id,
 			name: usuario.name,
 			token,
+			rol: usuario.rol,
 		});
 	} catch (error) {
 		console.log(error);
@@ -45,7 +53,8 @@ const crearUsuario = async (req, res = express.response) => {
 };
 
 const loginUsuario = async (req, res = express.response) => {
-	const { email, password } = req.body;
+	const { name, email, password } = req.body;
+
 	try {
 		const usuario = await Usuario.findOne({
 			email,
@@ -67,13 +76,21 @@ const loginUsuario = async (req, res = express.response) => {
 		}
 
 		//Generar nuestro JWT
-		const token = await generarJWT(usuario.id, usuario.name);
+		const payload = {
+			id: usuario._id,
+			name: usuario.name,
+		};
+
+		const token = jwt.sign(payload, process.env.SECRET_JWT_SEED, {
+			expiresIn: '2h',
+		});
 
 		res.status(201).json({
 			ok: true,
 			uid: usuario.id,
 			name: usuario.name,
 			token,
+			rol: usuario.rol,
 		});
 	} catch (error) {
 		console.log(error);

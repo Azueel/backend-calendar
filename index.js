@@ -22,8 +22,15 @@ app.use(express.json());
 //Rutas
 //TODO: auth // crear, login, renew
 app.use('/api/auth', require('./routes/auth'));
+
+//productos
+app.use('/api/product', require('./routes/product'));
+
 //TODO: CRUD: Eventos
 app.use('/api/events', require('./routes/events'));
+
+//homeScreen
+app.use('/api/home', require('./routes/home'));
 
 //escuchar peticiones
 app.listen(process.env.PORT, () => {
